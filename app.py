@@ -1,5 +1,7 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 from werkzeug.utils import secure_filename
+from PIL import Image
+import io
 import os
 
 UPLOAD_FOLDER = './uploads'
@@ -28,8 +30,21 @@ def upload_image():
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return {"success": f"Image '{filename}' uploaded and saved."}, 200
+
+#        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+#        return {"success": f"Image '{filename}' uploaded and saved."}, 200
+
+        # Read the image file and convert it to grayscale
+        image = Image.open(file.stream).convert('L')
+
+        # Save the grayscale image to a temporary file
+        output_buffer = io.BytesIO()
+        image.save(output_buffer, format='JPEG')
+        output_buffer.seek(0)
+
+        # Return the grayscale image to the client
+        return send_file(output_buffer, mimetype='image/jpeg', as_attachment=True, download_name='grayscale.jpg')
+
     else:
         return {"error": "File type not allowed."}, 400
 
