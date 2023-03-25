@@ -20,6 +20,10 @@ def allowed_file(filename):
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
+    # print(request.headers)  # リクエストのヘッダー情報を出力
+    # print(request.files)    # リクエストのファイル情報を出力
+    # print(request.data)    # リクエストのファイル情報を出力
+
     if 'file' not in request.files:
         return {"error": "No file part in the request."}, 400
 
