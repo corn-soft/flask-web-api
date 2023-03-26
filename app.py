@@ -18,6 +18,8 @@ def hello_world():
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# 画像入力（結果画像送信有り）
+
 @app.route('/upload', methods=['POST'])
 def upload_image():
     # print(request.headers)  # リクエストのヘッダー情報を出力
@@ -49,6 +51,26 @@ def upload_image():
         # Return the grayscale image to the client
         return send_file(output_buffer, mimetype='image/jpeg', as_attachment=True, download_name='grayscale.jpg')
 
+    else:
+        return {"error": "File type not allowed."}, 400
+
+# 画像入力（結果画像送信有り）
+
+@app.route('/upload2', methods=['POST'])
+def upload_image2():
+    if 'file' not in request.files:
+        return {"error": "No file part in the request."}, 400
+
+    file = request.files['file']
+
+    if file.filename == '':
+        return {"error": "No file selected for uploading."}, 400
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+
+#        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return {"success": f"Image '{filename}' uploaded and saved."}, 200
     else:
         return {"error": "File type not allowed."}, 400
 
