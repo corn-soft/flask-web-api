@@ -54,7 +54,7 @@ def upload_image():
     else:
         return {"error": "File type not allowed."}, 400
 
-# 画像入力（結果画像送信有り）
+# 画像入力（結果画像送信無し）
 
 @app.route('/upload2', methods=['POST'])
 def upload_image2():
@@ -68,6 +68,13 @@ def upload_image2():
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
+
+        image = Image.open(file.stream).convert('L')
+
+        # Save the grayscale image to a temporary file
+        output_buffer = io.BytesIO()
+        image.save(output_buffer, format='JPEG')
+        output_buffer.seek(0)
 
 #        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return {"success": f"Image '{filename}' uploaded and saved."}, 200
